@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include <math.h>
 
 void MoveMouseRelative(int dx, int dy)
 {
@@ -2181,6 +2182,43 @@ const int AK47_LENGTH = sizeof(AK47Pattern) / sizeof(AK47Pattern[0]);
 const int SHAK_50_LENGTH = sizeof(SHAK_50Pattern) / sizeof(SHAK_50Pattern[0]);
 const int M11_LENGTH = sizeof(M11Pattern) / sizeof(M11Pattern[0]);
 
+
+
+// here replace 96.0 with your sensitivity value
+// scale = 50 / 80 = 0.625
+const double SENSITIVITY_SCALE = 52.0 / 96.0;
+
+// to keep fractional precision
+double leftoverX = 0.0, leftoverY = 0.0;
+
+void MoveMouseRelativeFractional(double dx, double dy)
+{
+    dx += leftoverX;
+    dy += leftoverY;
+
+    int moveX = static_cast<int>(floor(dx));
+    int moveY = static_cast<int>(floor(dy));
+
+    leftoverX = dx - moveX;
+    leftoverY = dy - moveY;
+
+    if (moveX != 0 || moveY != 0) {
+        INPUT input = {0};
+        input.type = INPUT_MOUSE;
+        input.mi.dx = moveX;
+        input.mi.dy = moveY;
+        input.mi.dwFlags = MOUSEEVENTF_MOVE;
+        SendInput(1, &input, sizeof(INPUT));
+    }
+}
+
+
+
+
+
+
+
+
 int main()
 {
     std::cout << "Running...\n";
@@ -2192,29 +2230,39 @@ int main()
         // Wait until LMB is pressed
         if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
             // LewisGun_LENGTH, Fcar_LENGTH, M60_LENGTH, XP_54_LENGTH, ARN_22_LENGTH, AK47_LENGTH, SHAK_50_LENGTH, M11_LENGTH
-            for (int i = 0; i < LewisGun_LENGTH; ++i) {
-            //for (int i = 0; i < Fcar_LENGTH; ++i) {
-            //for (int i = 0; i < M60_LENGTH; ++i) {
+            //  for (int i = 0; i < LewisGun_LENGTH; ++i) {
+            //  for (int i = 0; i < Fcar_LENGTH; ++i) {
+            //  for (int i = 0; i < M60_LENGTH; ++i) {
             //for (int i = 0; i < XP_54_LENGTH; ++i) {
-            //for (int i = 0; i < ARN_22_LENGTH; ++i) {
-            //for (int i = 0; i < AK47_LENGTH; ++i) {
-            //for (int i = 0; i < SHAK_50_LENGTH; ++i) {      //65
-            //for (int i = 0; i < M11_LENGTH; ++i) {
+            //  for (int i = 0; i < ARN_22_LENGTH; ++i) {
+            //  
+                      for (int i = 0; i < AK47_LENGTH; ++i) {
+            //  for (int i = 0; i < SHAK_50_LENGTH; ++i) {      //65
+            //  for (int i = 0; i < M11_LENGTH; ++i) {
+
+
+
                 // Exit pattern if mouse button released
                 if (!(GetAsyncKeyState(VK_LBUTTON) & 0x8000)) {
                     break;
                 }
                 //LewisGunPattern, FcarPattern, M60Pattern, XP_54Pattern, ARN_22Pattern, AK47Pattern, SHAK_50Pattern, M11Pattern
 
-                MoveMouseRelative(LewisGunPattern[i][0], LewisGunPattern[i][1]);
-                //MoveMouseRelative(FcarPattern[i][0], FcarPattern[i][1]);
-                //MoveMouseRelative(M60Pattern[i][0], M60Pattern[i][1]);
+                //  MoveMouseRelative(LewisGunPattern[i][0], LewisGunPattern[i][1]);
+                //  MoveMouseRelative(FcarPattern[i][0], FcarPattern[i][1]);
+                //  MoveMouseRelative(M60Pattern[i][0], M60Pattern[i][1]);
                 //MoveMouseRelative(XP_54Pattern[i][0], XP_54Pattern[i][1]);
-                //MoveMouseRelative(ARN_22Pattern[i][0], ARN_22Pattern[i][1]);
-                //MoveMouseRelative(AK47Pattern[i][0], AK47Pattern[i][1]);
-                //MoveMouseRelative(SHAK_50Pattern[i][0], SHAK_50Pattern[i][1]);
-                //MoveMouseRelative(M11Pattern[i][0], M11Pattern[i][1]);
-                Sleep(18);
+                //  MoveMouseRelative(ARN_22Pattern[i][0], ARN_22Pattern[i][1]);
+                //  MoveMouseRelative(AK47Pattern[i][0], AK47Pattern[i][1]);
+                //  MoveMouseRelative(SHAK_50Pattern[i][0], SHAK_50Pattern[i][1]);
+                //  MoveMouseRelative(M11Pattern[i][0], M11Pattern[i][1]);
+            
+
+                MoveMouseRelativeFractional(AK47Pattern[i][0] * SENSITIVITY_SCALE, AK47Pattern[i][1] * SENSITIVITY_SCALE);
+
+            
+            
+                Sleep(17);    // 18 for FCAR and ARN_22 
             }
         }
 
