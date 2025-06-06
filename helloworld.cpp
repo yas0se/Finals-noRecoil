@@ -2173,26 +2173,36 @@ const int M11Pattern[][2] = {
 
 
 
-const int Fcar_LENGTH = sizeof(FcarPattern) / sizeof(FcarPattern[0]);
-const int LewisGun_LENGTH = sizeof(LewisGunPattern) / sizeof(LewisGunPattern[0]);
-const int M60_LENGTH = sizeof(M60Pattern) / sizeof(M60Pattern[0]);
-const int XP_54_LENGTH = sizeof(XP_54Pattern) / sizeof(XP_54Pattern[0]);
-const int ARN_22_LENGTH = sizeof(ARN_22Pattern) / sizeof(ARN_22Pattern[0]);
-const int AK47_LENGTH = sizeof(AK47Pattern) / sizeof(AK47Pattern[0]);
-const int SHAK_50_LENGTH = sizeof(SHAK_50Pattern) / sizeof(SHAK_50Pattern[0]);
-const int M11_LENGTH = sizeof(M11Pattern) / sizeof(M11Pattern[0]);
 
+struct MousePattern {
+    const char* name;
+    const int (*pattern)[2];
+    int length;
+    int delay;
+};
 
+// Declare your pattern arrays (example placeholders)
+extern const int AK47Pattern[][2], LewisGunPattern[][2], FcarPattern[][2], 
+                 M60Pattern[][2], XP_54Pattern[][2], ARN_22Pattern[][2], 
+                 SHAK_50Pattern[][2], M11Pattern[][2];
 
-// here replace 96.0 with your sensitivity value
-// scale = 50 / 80 = 0.625
-const double SENSITIVITY_SCALE = 52.0 / 96.0;
+const MousePattern patterns[] = {
+    { "AK47", AK47Pattern, sizeof(AK47Pattern) / sizeof(AK47Pattern[0]), 17 },//0
+    { "LewisGun", LewisGunPattern, sizeof(LewisGunPattern) / sizeof(LewisGunPattern[0]), 17 },//1
+    { "Fcar", FcarPattern, sizeof(FcarPattern) / sizeof(FcarPattern[0]), 18 },//2
+    { "M60", M60Pattern, sizeof(M60Pattern) / sizeof(M60Pattern[0]), 17 },//3
+    { "XP_54", XP_54Pattern, sizeof(XP_54Pattern) / sizeof(XP_54Pattern[0]), 17 },//4
+    { "ARN_22", ARN_22Pattern, sizeof(ARN_22Pattern) / sizeof(ARN_22Pattern[0]), 18 },//5
+    { "SHAK_50", SHAK_50Pattern, sizeof(SHAK_50Pattern) / sizeof(SHAK_50Pattern[0]), 17 },//6
+    { "M11", M11Pattern, sizeof(M11Pattern) / sizeof(M11Pattern[0]), 17 }//7
+};
 
-// to keep fractional precision
+// Adjust this for your mouse sensitivity
+const double SENSITIVITY_SCALE = 52.0 / 84.0;
+
 double leftoverX = 0.0, leftoverY = 0.0;
 
-void MoveMouseRelativeFractional(double dx, double dy)
-{
+void MoveMouseRelativeFractional(double dx, double dy) {
     dx += leftoverX;
     dy += leftoverY;
 
@@ -2212,61 +2222,32 @@ void MoveMouseRelativeFractional(double dx, double dy)
     }
 }
 
-
-
-
-
-
-
-
-int main()
-{
+int main() {
     std::cout << "Running...\n";
-    std::cout << "➡️ Hold LEFT mouse button to run macro pattern\n";
+    std::cout << "➡️ Hold LEFT mouse button to run macro pattern\n\n";
 
-    while (true)
-    {
+    // Choose pattern dynamically (change index to select different weapon)
+    int selectedPatternIndex = 2; // AK47
+    const MousePattern& activePattern = patterns[selectedPatternIndex];
 
-        // Wait until LMB is pressed
+    std::cout << "Active pattern: " << activePattern.name << "\n";
+
+    while (true) {
         if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-            // LewisGun_LENGTH, Fcar_LENGTH, M60_LENGTH, XP_54_LENGTH, ARN_22_LENGTH, AK47_LENGTH, SHAK_50_LENGTH, M11_LENGTH
-            //  for (int i = 0; i < LewisGun_LENGTH; ++i) {
-            //  for (int i = 0; i < Fcar_LENGTH; ++i) {
-            //  for (int i = 0; i < M60_LENGTH; ++i) {
-            //for (int i = 0; i < XP_54_LENGTH; ++i) {
-            //  for (int i = 0; i < ARN_22_LENGTH; ++i) {
-            //  
-                      for (int i = 0; i < AK47_LENGTH; ++i) {
-            //  for (int i = 0; i < SHAK_50_LENGTH; ++i) {      //65
-            //  for (int i = 0; i < M11_LENGTH; ++i) {
-
-
-
-                // Exit pattern if mouse button released
-                if (!(GetAsyncKeyState(VK_LBUTTON) & 0x8000)) {
+            for (int i = 0; i < activePattern.length; ++i) {
+                if (!(GetAsyncKeyState(VK_LBUTTON) & 0x8000))
                     break;
-                }
-                //LewisGunPattern, FcarPattern, M60Pattern, XP_54Pattern, ARN_22Pattern, AK47Pattern, SHAK_50Pattern, M11Pattern
 
-                //  MoveMouseRelative(LewisGunPattern[i][0], LewisGunPattern[i][1]);
-                //  MoveMouseRelative(FcarPattern[i][0], FcarPattern[i][1]);
-                //  MoveMouseRelative(M60Pattern[i][0], M60Pattern[i][1]);
-                //MoveMouseRelative(XP_54Pattern[i][0], XP_54Pattern[i][1]);
-                //  MoveMouseRelative(ARN_22Pattern[i][0], ARN_22Pattern[i][1]);
-                //  MoveMouseRelative(AK47Pattern[i][0], AK47Pattern[i][1]);
-                //  MoveMouseRelative(SHAK_50Pattern[i][0], SHAK_50Pattern[i][1]);
-                //  MoveMouseRelative(M11Pattern[i][0], M11Pattern[i][1]);
-            
+                MoveMouseRelativeFractional(
+                    activePattern.pattern[i][0] * SENSITIVITY_SCALE,
+                    activePattern.pattern[i][1] * SENSITIVITY_SCALE
+                );
 
-                MoveMouseRelativeFractional(AK47Pattern[i][0] * SENSITIVITY_SCALE, AK47Pattern[i][1] * SENSITIVITY_SCALE);
-
-            
-            
-                Sleep(17);    // 18 for FCAR and ARN_22 
+                Sleep(activePattern.delay);
             }
         }
 
-        Sleep(1); // Avoid high CPU usage
+        Sleep(1); // Reduce CPU usage
     }
 
     return 0;
