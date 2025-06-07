@@ -5,6 +5,8 @@ Ce projet est une interface graphique en C++ utilisant WinAPI, permettant à l'u
 
 # Demo vide link: [Here](https://youtu.be/qCPxCBl5-ec)
 
+![image](https://github.com/user-attachments/assets/5ebf93a5-cd61-431b-a61b-5f7dbe77cda0)
+
 
 # Modify your sense in code (ligne 2229) (mine is 84)
 
